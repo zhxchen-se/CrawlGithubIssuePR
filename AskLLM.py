@@ -41,7 +41,7 @@ def update_file_with_llm_answers(file, client):
             print(f"Currently asking about issue: {row['html_url']}")
             title = row['title']
             post_content = row['post_content']
-            # Use your custom Prompt Here
+            # prompt = f"""Title: {title}\n\nPost Content: {post_content}\n\nPlease provide a detailed answer to the above post content."""
             prompt = f"""
             ```
             Title: {title}
