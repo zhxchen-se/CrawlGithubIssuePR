@@ -2,6 +2,7 @@ from openai import OpenAI
 import pandas as pd
 import os
 import traceback
+from tqdm import tqdm
 from time import sleep
 
 def get_llm_answer(prompt, client):
@@ -33,7 +34,7 @@ def update_file_with_llm_answers(file, client):
     if 'LLM_Answer' not in df.columns:
         df['LLM_Answer'] = ''
 
-    for index, row in df.iterrows():
+    for index, row in tqdm(df.iterrows(), total=len(df)):
         if pd.isna(row['LLM_Answer']) or row['LLM_Answer'] == '':
             if pd.isna(row['post_content']) or row['post_content'] == '':
                 print(f"Skipping issue with empty post_content: {row['html_url']}")
@@ -56,12 +57,16 @@ def update_file_with_llm_answers(file, client):
 
 
 if __name__ == '__main__':
+    # repos = {
+    #     'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4'},
+    #     'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2'},
+    #     'MoveIt2': {'repo_owner': 'moveit', 'repo_name': 'moveit2'},
+    #     'Navigation2': {'repo_owner': 'ros-navigation', 'repo_name': 'navigation2'},
+    #     'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros'},
+    #     'ros_canopen': {'repo_owner': 'ros-industrial', 'repo_name': 'ros_canopen'}
+    # }
     repos = {
-        'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4'},
-        'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2'},
-        'MoveIt2': {'repo_owner': 'moveit', 'repo_name': 'moveit2'},
-        'Navigation2': {'repo_owner': 'ros-navigation', 'repo_name': 'navigation2'},
-        'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros'}
+        'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control'}
     }
     client = OpenAI(api_key=os.getenv('DEEPSEEK_API_KEY'),
                     base_url="https://api.deepseek.com")

@@ -4,8 +4,10 @@ import os
 from time import sleep
 import pandas as pd
 import traceback
+from tqdm import tqdm
 
 def get_closed_issues_list(repo_owner, repo_name, personal_token):
+    print(f'Fetching closed issues for repo: {repo_name}')
     res_ls = []
     base_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/issues'
     params = {
@@ -95,6 +97,7 @@ def get_post_content(issue_html_url, personal_token):
 
 
 def update_file_with_post_content(file, personal_token, issue_range):
+    print(f"Getting post content for issues in file: {file}")
     df = pd.read_excel(file, engine='openpyxl')
     df['issue_number'] = df['html_url'].apply(lambda url: int(url.split('/')[-1]))
     if 'post_content' not in df.columns:
@@ -118,7 +121,7 @@ def update_file_with_post_content(file, personal_token, issue_range):
             return None
     
     # 每爬取完一行，就保存一次
-    for index, row in df_filtered.iterrows():
+    for index, row in tqdm(df_filtered.iterrows(),total=len(df_filtered)):
         post_content = fetch_post_content(row['html_url'], personal_token)
         if post_content is not None:
             df.at[index, 'post_content'] = str(post_content)  # 确保 post_content 是字符串类型
@@ -137,23 +140,21 @@ if __name__ == '__main__':
     # 'Navigation2': {'repo_owner': 'ros-navigation', 'repo_name': 'navigation2'},
     # 'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros'},
     # 'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2'},
-    # 'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4'}
+    # 'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4'},
+    # 'velodyne': {'repo_owner': 'ros-drivers', 'repo_name': 'velodyne','issue_range': (-2, -1)},
+    # 'ros_canopen': {'repo_owner': 'ros-industrial', 'repo_name': 'ros_canopen','issue_range': (-2, -1)}
     # }
     repos = {
-    'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4','issue_range': (161, 260)},
-    'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2','issue_range': (275, 622)},
-    'MoveIt2': {'repo_owner': 'moveit', 'repo_name': 'moveit2','issue_range': (2165, 2737)},
-    'Navigation2': {'repo_owner': 'ros-navigation', 'repo_name': 'navigation2','issue_range': (636, 3800)},
-    'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros','issue_range': (1624, 1950)}
+        'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control','issue_range': (-2, -1)}
     }
     personal_token = os.getenv('GITHUB_PERSONAL_TOKEN')
 
     # 批量爬取issue&pr列表，包括标题+URL
     # for repo in repos.values():
-        # get_closed_issues_list(repo['repo_owner'], repo['repo_name'], personal_token)
+    #     get_closed_issues_list(repo['repo_owner'], repo['repo_name'], personal_token)
 
     # 获取帖子的发帖内容+comments
-    # for repo in repos.values():
-    #     file = f'./IssueList/{repo["repo_name"]}_data.xlsx'
-    #     update_file_with_post_content(file, personal_token, repo['issue_range'])
+    for repo in repos.values():
+        file = f'./IssueList/{repo["repo_name"]}_data.xlsx'
+        update_file_with_post_content(file, personal_token, repo['issue_range'])
 
