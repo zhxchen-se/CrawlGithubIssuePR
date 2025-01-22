@@ -7,6 +7,12 @@ import traceback
 from tqdm import tqdm
 
 def get_closed_issues_list(repo_owner, repo_name, personal_token):
+    file_path = f'./IssueList/{repo_name}_data.xlsx'
+    # 检查文件是否存在
+    if os.path.exists(file_path):
+        print(f'File already exists, skipping fetching closed issues for repo: {repo_name}')
+        return
+    
     print(f'Fetching closed issues for repo: {repo_name}')
     res_ls = []
     base_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/issues'
@@ -32,14 +38,13 @@ def get_closed_issues_list(repo_owner, repo_name, personal_token):
                     'html_url': issue['html_url'],
                     'closed_at': issue['closed_at']
                 }
-                print(dic)
                 res_ls.append(dic)
             page += 1
         else:
             print(f'Error: {response.status_code}')
             break
     df = pd.DataFrame(res_ls)
-    df.to_excel(f'./IssueList/{repo_name}_data.xlsx', index=False, engine='xlsxwriter')
+    df.to_excel(file_path, index=False, engine='xlsxwriter')
 
 
 # 获取帖子最开头的内容
@@ -141,17 +146,25 @@ if __name__ == '__main__':
     # 'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros'},
     # 'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2'},
     # 'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4'},
-    # 'velodyne': {'repo_owner': 'ros-drivers', 'repo_name': 'velodyne','issue_range': (-2, -1)},
-    # 'ros_canopen': {'repo_owner': 'ros-industrial', 'repo_name': 'ros_canopen','issue_range': (-2, -1)}
+    # 'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control','issue_range': (-2, -1)}
     # }
     repos = {
-        'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control','issue_range': (-2, -1)}
+        'MoveIt2': {'repo_owner': 'moveit', 'repo_name': 'moveit2','issue_range': (-2, -1)},
+        'Navigation2': {'repo_owner': 'ros-navigation', 'repo_name': 'navigation2','issue_range': (-2, -1)},
+        'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros','issue_range': (-2, -1)},
+        'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2','issue_range': (-2, -1)},
+        'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4','issue_range': (-2, -1)},
+        'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control','issue_range': (-2, -1)},
+        'Universal_Robots_ROS2_Driver': {'repo_owner': 'UniversalRobots', 'repo_name': 'Universal_Robots_ROS2_Driver','issue_range': (-2, -1)},
+        'depthai-ros': {'repo_owner': 'luxonis', 'repo_name': 'depthai-ros','issue_range': (-2, -1)},
+        'realsense-ros': {'repo_owner': 'IntelRealSense', 'repo_name': 'realsense-ros','issue_range': (-2, -1)}, 
+        'ros2_controllers': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_controllers','issue_range': (-2, -1)},
     }
     personal_token = os.getenv('GITHUB_PERSONAL_TOKEN')
 
     # 批量爬取issue&pr列表，包括标题+URL
-    # for repo in repos.values():
-    #     get_closed_issues_list(repo['repo_owner'], repo['repo_name'], personal_token)
+    for repo in repos.values():
+        get_closed_issues_list(repo['repo_owner'], repo['repo_name'], personal_token)
 
     # 获取帖子的发帖内容+comments
     for repo in repos.values():

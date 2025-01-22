@@ -66,7 +66,16 @@ if __name__ == '__main__':
     #     'ros_canopen': {'repo_owner': 'ros-industrial', 'repo_name': 'ros_canopen'}
     # }
     repos = {
-        'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control'}
+        'MoveIt2': {'repo_owner': 'moveit', 'repo_name': 'moveit2'},
+        'Navigation2': {'repo_owner': 'ros-navigation', 'repo_name': 'navigation2'},
+        'MAVROS': {'repo_owner': 'mavlink', 'repo_name': 'mavros'},
+        'aerostack2': {'repo_owner': 'aerostack2', 'repo_name': 'aerostack2'},
+        'turtlebot4': {'repo_owner': 'turtlebot', 'repo_name': 'turtlebot4'},
+        'ros2_control': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_control'},
+        'Universal_Robots_ROS2_Driver': {'repo_owner': 'UniversalRobots', 'repo_name': 'Universal_Robots_ROS2_Driver'},
+        'depthai-ros': {'repo_owner': 'luxonis', 'repo_name': 'depthai-ros'},
+        'realsense-ros': {'repo_owner': 'IntelRealSense', 'repo_name': 'realsense-ros'}, 
+        'ros2_controllers': {'repo_owner': 'ros-controls', 'repo_name': 'ros2_controllers'},
     }
     client = OpenAI(api_key=os.getenv('DEEPSEEK_API_KEY'),
                     base_url="https://api.deepseek.com")
